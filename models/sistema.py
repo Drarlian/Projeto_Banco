@@ -64,10 +64,6 @@ class Conta:
     def numero_conta(self) -> int:
         return self.__numero_conta
 
-    @numero_conta.setter
-    def numero_conta(self, numero_conta: int) -> None:
-        self.__numero_conta = numero_conta
-
     @property
     def saldo(self) -> float:
         return self.__saldo
@@ -79,21 +75,65 @@ class Conta:
     def __str__(self) -> str:
         return f'Cliente -> {self.cliente} | Conta-> Número da conta: {self.numero_conta} | Saldo: {self.saldo}'
 
-    def sacar(self):
-        pass
+    def sacar(self, valor: float) -> None:
+        if self.saldo >= valor:
+            self.saldo -= valor
+            self.__atualizar_saldo_conta_atual()
+        else:
+            print('Saldo Insuficiente!')
 
-    def depositar(self):
-        pass
+    def depositar(self, valor: float) -> None:
+        self.saldo += valor
+        self.__atualizar_saldo_conta_atual()
 
-    def transferir(self):
-        pass
+    def transferir(self, cpf_destino: int, valor: float) -> None:
+        if cpf_destino != self.cliente.cpf:
+            if verificar_conta_existe(cpf_destino):
+                if self.saldo >= valor:
+                    self.__atualizar_saldo_transferencia(cpf_destino, valor)
+                else:
+                    print('Saldo Insuficiente.')
+            else:
+                print('A conta informada não existe.')
+        else:
+            print('O CPF informado é da conta atual.')
+
+    def __atualizar_saldo_conta_atual(self) -> None:
+        caminho = 'dados\\contas.json'
+        with open(caminho, 'r', encoding='UTF-8') as arquivo:
+            conteudo: str = arquivo.read()
+
+        ret: list = decode(conteudo)
+        for conta in ret:
+            if conta.numero_conta == self.numero_conta:
+                conta.saldo = self.saldo
+
+        with open(caminho, 'w', encoding='UTF-8') as arquivo:
+            ret = encode(ret)
+            arquivo.write(ret)
+
+    def __atualizar_saldo_transferencia(self, cpf_destino: int, valor: float) -> None:
+        banco = Banco()
+        caminho: str = 'dados\\contas.json'
+
+        ret: list = banco.contas
+        for conta in ret:
+            if conta.numero_conta == self.numero_conta:
+                self.saldo -= valor
+                conta.saldo = self.saldo
+            if conta.cliente.cpf == cpf_destino:
+                conta.saldo += valor
+
+        with open(caminho, 'w', encoding='UTF-8') as arquivo:
+            ret = encode(ret)
+            arquivo.write(ret)
 
     def pegar_dados_conta(self, cpf: int):
         banco = Banco()
         for conta in banco.contas:
             if conta.cliente.cpf == cpf:
-                self.numero_conta = conta.numero_conta
-                self.saldo = conta.saldo
+                self.__numero_conta = conta.numero_conta
+                self.__saldo = conta.saldo
 
     def __gerar_numero_conta(self) -> int:
         caminho = 'dados\\contas.json'
@@ -113,7 +153,7 @@ class Conta:
         caminho = 'dados\\contas.json'
         if path.exists(caminho):
             with open(caminho, 'r', encoding='UTF-8') as arquivo:
-                conteudo = arquivo.read()
+                conteudo: str = arquivo.read()
             with open(caminho, 'w', encoding='UTF-8') as arquivo:
                 if conteudo != '':
                     ret: list = decode(conteudo)

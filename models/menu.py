@@ -1,10 +1,10 @@
 from models.sistema import Banco, Cliente, Conta, verificar_conta_existe, pegar_dados_cliente
-from verifica.verifica_dado import verifica_int
+from verifica.verifica_dado import verifica_int, verifica_float
 from time import sleep
 
 def menu_base():
     while True:
-        print('Banco Hype')
+        cabecalho('Banco Hype')
         print('1 - Criar Conta')
         print('2 - Entrar em uma Conta')
         print('3 - Listar Contas')
@@ -13,6 +13,7 @@ def menu_base():
         opcao = verifica_int('Digite a opção: ')
 
         if opcao == 1:
+            cabecalho('Criação de Conta')
             print('Informe seus dados:')
             cpf = verifica_int('CPF: ')
             if not verificar_conta_existe(cpf):
@@ -26,6 +27,7 @@ def menu_base():
                 print('O CPF informado já está em uso.')
             sleep(2)
         elif opcao == 2:
+            cabecalho('Login')
             cpf = verifica_int('Informe o CPF: ')
             if verificar_conta_existe(cpf):
                 cliente = pegar_dados_cliente(cpf)
@@ -34,10 +36,11 @@ def menu_base():
             else:
                 print('O CPF informado não está registrado.')
         elif opcao == 3:
+            cabecalho('Contas Existentes')
             banco = Banco()
-            for conta in banco:
+            for conta in banco.contas:
                 print(conta)
-                print('-' * 20)
+                print('-' * 60)
             sleep(2)
         elif opcao == 4:
             print('Volte Sempre :)')
@@ -49,28 +52,44 @@ def menu_base():
 
 def menu_cliente(conta: Conta):
     while True:
-        print('Banco Hype')
-        print('1 - Efetuar Saque')
-        print('2 - Efetuar Depósito')
-        print('3 - Efetuar Transferência')
-        print('4 - Voltar')
-        print('5 - Sair do Sistema')
+        cabecalho('Banco Hype')
+        print('1 - Checar Saldo')
+        print('2 - Efetuar Saque')
+        print('3 - Efetuar Depósito')
+        print('4 - Efetuar Transferência')
+        print('5 - Voltar')
+        print('6 - Sair do Sistema')
 
         opcao = verifica_int('Digite a opção: ')
 
         if opcao == 1:
-            pass
+            print(f'Saldo Atual: R${conta.saldo}')
         elif opcao == 2:
-            pass
+            cabecalho('Saque')
+            valor = verifica_float('Informe o valor: R$')
+            conta.sacar(valor)
         elif opcao == 3:
-            pass
+            cabecalho('Depósito')
+            valor = verifica_float('Informe o valor: R$')
+            conta.depositar(valor)
         elif opcao == 4:
+            cabecalho('Transferência')
+            cpf: int = verifica_int('Informe o CPF da conta destino: ')
+            valor: float = verifica_float('Informe o valor: R$')
+            conta.transferir(cpf, valor)
+        elif opcao == 5:
             print('Voltando...')
             sleep(2)
             menu_base()
-        elif opcao == 5:
+        elif opcao == 6:
             print('Volte Sempre :)')
             sleep(2)
             exit()
         else:
             print('Opção inválida!')
+
+
+def cabecalho(mensagem: str) -> None:
+    print('-' * 60)
+    print(mensagem.center(60))
+    print('-' * 60)
