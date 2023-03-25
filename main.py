@@ -1,3 +1,4 @@
-from models.menu import menu
+from models.menu import menu_base
 
-menu()
+
+menu_base()

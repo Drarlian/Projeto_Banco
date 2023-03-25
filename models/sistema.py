@@ -11,19 +11,19 @@ class Cliente:
         self.__registrar_cliente()
 
     @property
-    def nome(self) -> None:
+    def nome(self) -> str:
         return self.__nome
 
     @property
-    def sobrenome(self) -> None:
+    def sobrenome(self) -> str:
         return self.__sobrenome
 
     @property
-    def idade(self) -> None:
+    def idade(self) -> int:
         return self.__idade
 
     @property
-    def cpf(self) -> None:
+    def cpf(self) -> int:
         return self.__cpf
 
     def __str__(self) -> str:
@@ -48,23 +48,35 @@ class Cliente:
 class Conta:
     def __init__(self, cliente: Cliente) -> None:
         self.__cliente: Cliente = cliente
-        self.__numero_conta: int = self.__gerar_numero_conta()
-        self.__saldo: float = 0.0
-        self.__registrar_conta()
+
+        if verificar_conta_existe(cliente.cpf):
+            self.pegar_dados_conta(cliente.cpf)
+        else:
+            self.__numero_conta: int = self.__gerar_numero_conta()
+            self.__saldo: float = 0.0
+            self.__registrar_conta()
 
     @property
-    def cliente(self) -> None:
+    def cliente(self) -> Cliente:
         return self.__cliente
 
     @property
-    def numero_conta(self) -> None:
+    def numero_conta(self) -> int:
         return self.__numero_conta
 
+    @numero_conta.setter
+    def numero_conta(self, numero_conta: int) -> None:
+        self.__numero_conta = numero_conta
+
     @property
-    def saldo(self) -> None:
+    def saldo(self) -> float:
         return self.__saldo
 
-    def __str__(self) -> None:
+    @saldo.setter
+    def saldo(self, saldo: float) -> None:
+        self.__saldo = saldo
+
+    def __str__(self) -> str:
         return f'Cliente -> {self.cliente} | Conta-> Número da conta: {self.numero_conta} | Saldo: {self.saldo}'
 
     def sacar(self):
@@ -75,6 +87,13 @@ class Conta:
 
     def transferir(self):
         pass
+
+    def pegar_dados_conta(self, cpf: int):
+        banco = Banco()
+        for conta in banco.contas:
+            if conta.cliente.cpf == cpf:
+                self.numero_conta = conta.numero_conta
+                self.saldo = conta.saldo
 
     def __gerar_numero_conta(self) -> int:
         caminho = 'dados\\contas.json'
@@ -111,6 +130,14 @@ class Banco:
         self.__clientes: List[Cliente] = self.__buscar_clientes()
         self.__contas: List[Conta] = self.__buscar_contas()
 
+    @property
+    def clientes(self) -> list:
+        return self.__clientes
+
+    @property
+    def contas(self) -> list:
+        return self.__contas
+
     def imprimir_clientes(self) -> None:
         for cliente in self.__clientes:
             print(cliente)
@@ -124,17 +151,39 @@ class Banco:
         if path.exists(caminho):
             with open(caminho, 'r', encoding='UTF-8') as arquivo:
                 conteudo = arquivo.read()
-                ret: list = decode(conteudo)
+                if conteudo != '':
+                    ret: list = decode(conteudo)
+                else:
+                    ret = []
             return ret
         else:
-            return None
+            return []
 
     def __buscar_contas(self) -> list:
         caminho = 'dados\\contas.json'
         if path.exists(caminho):
             with open(caminho, 'r', encoding='UTF-8') as arquivo:
                 conteudo = arquivo.read()
-                ret: dict = decode(conteudo)
+                if conteudo != '':
+                    ret: dict = decode(conteudo)
+                else:
+                    ret = []
             return ret
         else:
-            return None
+            return []
+
+
+def verificar_conta_existe(cpf: int) -> bool:
+    banco = Banco()
+    for conta in banco.contas:
+        if conta.cliente.cpf == cpf:
+            return True
+    return False
+
+
+def pegar_dados_cliente(cpf: int) -> Cliente:
+    banco = Banco()
+    for cliente in banco.clientes:
+        if cliente.cpf == cpf:
+            return cliente
+    return None
