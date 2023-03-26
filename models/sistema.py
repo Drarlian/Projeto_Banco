@@ -76,26 +76,29 @@ class Conta:
         return f'Cliente -> {self.cliente} | Conta-> Número da conta: {self.numero_conta} | Saldo: R${self.saldo:.2f}'
 
     def sacar(self, valor: float) -> None:
-        if self.saldo >= valor:
+        if self.saldo >= valor > 0:
             self.saldo -= valor
             self.__atualizar_saldo_conta_atual()
             print('Saque realizado com sucesso.')
         else:
-            print('Saldo Insuficiente!')
+            print('Saque inválido.')
 
     def depositar(self, valor: float) -> None:
-        self.saldo += valor
-        self.__atualizar_saldo_conta_atual()
-        print('Deposito realizado com sucesso.')
+        if valor > 0:
+            self.saldo += valor
+            self.__atualizar_saldo_conta_atual()
+            print('Deposito realizado com sucesso.')
+        else:
+            print('Deposito inválido.')
 
     def transferir(self, cpf_destino: int, valor: float) -> None:
         if cpf_destino != self.cliente.cpf:
             if verificar_conta_existe(cpf_destino):
-                if self.saldo >= valor:
+                if self.saldo >= valor > 0:
                     self.__atualizar_saldo_transferencia(cpf_destino, valor)
                     print('Transferência realizada com sucesso.')
                 else:
-                    print('Saldo Insuficiente.')
+                    print('Transferência inválida.')
             else:
                 print('A conta informada não existe.')
         else:

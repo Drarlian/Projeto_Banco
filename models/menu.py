@@ -22,29 +22,37 @@ def menu_base():
                 idade = verifica_int('Idade: ')
                 cliente = Cliente(nome, sobrenome, idade, cpf)
                 conta = Conta(cliente)
+                print('Criando conta...')
+                sleep(2)
                 menu_cliente(conta)
             else:
                 print('O CPF informado já está em uso.')
             sleep(2)
         elif opcao == 2:
-            cabecalho('Login')
-            cpf = verifica_int('Informe o CPF: ')
-            if verificar_conta_existe(cpf):
-                cliente = pegar_dados_cliente(cpf)
-                conta = Conta(cliente)
-                menu_cliente(conta)
+            banco = Banco()
+            if len(banco.contas) > 0:
+                cabecalho('Login')
+                cpf = verifica_int('Informe o CPF: ')
+                if verificar_conta_existe(cpf):
+                    cliente = pegar_dados_cliente(cpf)
+                    conta = Conta(cliente)
+                    print('Logando...')
+                    sleep(2)
+                    menu_cliente(conta)
+                else:
+                    print('O CPF informado não está registrado.')
             else:
-                print('O CPF informado não está registrado.')
+                print('Não existem contas registradas.')
             sleep(2)
         elif opcao == 3:
             banco = Banco()
-            if len(banco.contas) != 0:
+            if len(banco.contas) > 0:
                 cabecalho('Contas Existentes')
                 for conta in banco.contas:
                     print(conta)
                     print('-' * 60)
             else:
-                print('Não há contas registradas.')
+                print('Não existem contas registradas.')
             sleep(2)
         elif opcao == 4:
             print('Volte Sempre :)')
