@@ -35,12 +35,16 @@ def menu_base():
                 menu_cliente(conta)
             else:
                 print('O CPF informado não está registrado.')
+            sleep(2)
         elif opcao == 3:
-            cabecalho('Contas Existentes')
             banco = Banco()
-            for conta in banco.contas:
-                print(conta)
-                print('-' * 60)
+            if len(banco.contas) != 0:
+                cabecalho('Contas Existentes')
+                for conta in banco.contas:
+                    print(conta)
+                    print('-' * 60)
+            else:
+                print('Não há contas registradas.')
             sleep(2)
         elif opcao == 4:
             print('Volte Sempre :)')
@@ -63,20 +67,24 @@ def menu_cliente(conta: Conta):
         opcao = verifica_int('Digite a opção: ')
 
         if opcao == 1:
-            print(f'Saldo Atual: R${conta.saldo}')
+            print(f'Saldo Atual: R${conta.saldo:.2f}')
+            sleep(2)
         elif opcao == 2:
             cabecalho('Saque')
             valor = verifica_float('Informe o valor: R$')
             conta.sacar(valor)
+            sleep(2)
         elif opcao == 3:
             cabecalho('Depósito')
             valor = verifica_float('Informe o valor: R$')
             conta.depositar(valor)
+            sleep(2)
         elif opcao == 4:
             cabecalho('Transferência')
             cpf: int = verifica_int('Informe o CPF da conta destino: ')
             valor: float = verifica_float('Informe o valor: R$')
             conta.transferir(cpf, valor)
+            sleep(2)
         elif opcao == 5:
             print('Voltando...')
             sleep(2)
